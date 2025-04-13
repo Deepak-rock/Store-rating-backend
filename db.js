@@ -14,3 +14,5 @@ const db = new Client({
 db.connect()
   .then(() => console.log('DB Connected'))
   .catch((err) => console.error('DB Connection Error:', err.stack));
+
+module.exports = db;
