@@ -285,11 +285,16 @@ app.get('/store/dashboard', authMiddleware, storeMiddleware, async (req, res) =>
       [storeId]
     );
 
+    if (!storeInfo.rows.length) {
+      return res.status(404).json({ error: 'Store not found' });
+    }
+    
     res.json({
       store_name: storeInfo.rows[0].name,
       average_rating: avg.rows[0].avg_rating || 0,
       ratings: result.rows,
     });
+
   } catch (err) {
     console.error('Dashboard error:', err);
     res.status(500).json({ error: 'Internal server error' });
