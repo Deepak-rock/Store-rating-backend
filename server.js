@@ -3,7 +3,7 @@ const cors = require("cors");
 const bcrypt = require('bcryptjs');
 const db = require('./db')
 const jwt = require('jsonwebtoken');
-const {authMiddleware, adminMiddleware, storeMiddleware} = require('./middleware');
+const {authMiddleware, adminMiddleware, storeMiddleware, userMiddleware} = require('./middleware');
 require('dotenv').config();
 
 const app = express();
@@ -210,7 +210,7 @@ app.get('/stores', authMiddleware, async (req, res) => {
         COUNT(r.id) AS rating_count
       FROM stores s
         LEFT JOIN ratings r ON s.id = r.store_id
-        WHERE s.name ILIKE $2 AND s.address ILIKE $3
+        WHERE s.name ILIKE $2 OR s.address ILIKE $3
         GROUP BY s.id`,
       [userId, `%${name}%`, `%${address}%`]
     );
@@ -291,8 +291,8 @@ app.get('/store/dashboard', authMiddleware, storeMiddleware, async (req, res) =>
   }
 });
 
-// PUT /store-owner/password
-app.put('/password', authMiddleware, storeMiddleware, async (req, res) => {
+// PUT Update password
+app.put('/password', authMiddleware, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   const userId = req.user.id;
 

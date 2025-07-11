@@ -34,4 +34,9 @@ const storeMiddleware = (req, res, next) => {
   next();
 };
 
-module.exports = { authMiddleware, adminMiddleware, storeMiddleware};
+const userMiddleware = (req, res, next) => {
+  if (req.user.role !== 'normal') return res.status(403).json({ error: 'Access denied' });
+  next();
+};
+
+module.exports = { authMiddleware, adminMiddleware, storeMiddleware, userMiddleware};
