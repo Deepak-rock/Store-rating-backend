@@ -17,6 +17,11 @@ const generateToken = (user) => {
   return jwt.sign({ id: user.id, role: user.role }, JWT_SECRET);
 };
 
+app.get('/', async (req, res) => {
+  const result = await db.query("SELECT * FROM users");
+  res.json(result.rows)
+})
+
 // Register new user.
 app.post("/register", async (req, res) => {
   try {
