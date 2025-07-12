@@ -1,108 +1,139 @@
-# 🏪 Store Rating API Backend
+# 🧠 Store Rating Backend
 
-A full-featured backend built with **Node.js**, **Express.js**, and **PostgreSQL** to manage users, store owners, store listings, and customer ratings.
-
-## 🚀 Features
-
-- 🔐 Secure user authentication (JWT-based)
-- 👥 User roles: `user`, `store_owner`, `admin`
-- 🏬 Store management for store owners
-- ⭐ Rate stores (1 to 5)
-- 📊 Store dashboard with average ratings
-- 🛡️ Middleware-based role protection
+A robust backend system to manage store listings, user accounts, and customer ratings. Built using **Node.js**, **Express.js**, and **PostgreSQL** — designed to scale, secure, and serve rapidly.
 
 ---
 
-## 🧱 Tech Stack
+## ⚙️ Tech Stack
 
-- **Backend:** Node.js, Express.js
-- **Database:** PostgreSQL
-- **Auth:** JWT, bcrypt
-- **Environment:** dotenv
-- **Validation:** PostgreSQL constraints
-
----
-
-## 📁 Project Structure
-
-BACKEND/
-├── .env # Environment variables
-├── db.js # PostgreSQL DB config
-├── middleware.js # Auth & Role-based Middleware
-├── server.js # Main Express server
-├── package.json
-└── README.md # This file
-
-🚀 Setup Instructions
-
-1. Clone the repository
-
-git clone https://github.com/Deepak-rock/Store-rating-backend
-
-2. Install dependencies
-
-npm install
-
-3. Configure Environment Variables
-Create a .env file:
-
-PORT=5000 //example
-DATABASE_URL=postgresql://user:password@localhost:5432/dbname //example
-JWT_SECRET=yourSuperSecretKey //example
-
-4. Start the Server
-
-npm start
+- **Node.js** – JavaScript runtime
+- **Express.js** – Backend framework
+- **PostgreSQL** – Relational database
+- **JWT** – Secure authentication
+- **bcrypt** – Password hashing
+- **dotenv** – Environment configuration
 
 ---
 
-Server will run at: http://localhost:5000
+## 📦 Getting Started
 
-🔑 API Endpoints
-Auth
-POST /login → Login and receive JWT
+### 🔧 Prerequisites
 
-Store Owner
-GET /store/dashboard → View store rating analytics (Protected)
-
-🗄️ PostgreSQL Schema (Simplified)
-users
-id, name, email, password_hash, address, role
-
-stores
-id, name, address, owner_id, email
-
-ratings
-id, user_id, store_id, rating (1-5)
-
-🔒 Middleware
-authMiddleware → Verifies JWT
-
-adminMiddleware → Restricts to admin role
-
-storeMiddleware → Restricts to store owners
-
-✅ Future Enhancements
-🧾 Add registration with validation
-
-💬 Review/comment system
-
-📍 Location-based store search
-
-📈 Admin dashboard analytics
-
-☁️ Deploy on Render/Heroku with SSL
-
-🧠 Author
-Made with focus and innovation by [Your Name]
-
-📜 License
-MIT License — free to use, modify and distribute.
+- Node.js (v18+ recommended)
+- PostgreSQL (local or cloud)
+- npm
 
 ---
 
-### 🔁 Customize
-- Replace Deepak U and GitHub repo URL https://github.com/Deepak-rock/Store-rating-backend.
-- Add setup screenshots or Postman collection if needed.
+### 🚀 Setup Instructions
 
-Want the **frontend README** or **PostgreSQL migration scripts** next?
+1. **Clone the repository**
+
+    ```bash
+    git clone https://github.com/Deepak-rock/store-rating-backend
+
+2. **Install dependencies**
+
+    ```bash
+    npm install
+
+3. **Configure environment**
+
+Create a .env file in the root directory:
+
+    # You can provide any Port
+    PORT=5001
+    # Provide your Database Url from render || docker || local.  
+    DB_URL= postgresql://username:password@port/your_database_name 
+
+Copy from .env.example if available.
+
+4. **Start the server**
+    ```bash
+    npm run dev     # For development with nodemon
+    npm start       # For production`
+
+---
+
+### 🧠 API Endpoints
+
+    | Method |         Endpoint        |           Description         |
+    | ------ | ----------------------- | ----------------------------- |
+    |  POST  | `/register`             |   Register new user           |
+    |  POST  | `/login`                |   Login and get JWT           |
+    |  POST  | `/admin/users`          |   Add user (admin-only)       |
+    |  POST  | `/admin/stores`         |   Add Store (admin-only)      |
+    |  GET   | `/admin/dashboard`      |   Dashboard stats(admin-only) |
+    |  GET   | `/admin/users`          |   Route: Filter users         |
+    |  GET   | `/admin/stores`         |   Route: Filter stores        |
+    |  GET   | `/admin/users/:id`      |   User details                |
+    |  GET   | `/stores`               |   List of Store for user      |
+    |  POST  | `/stores/:storeId/rate` |   Store rating                |
+    |  GET   | `/store/dashboard`      |   Store dashboard             |
+    |  PUT   | `/password`             |   Update password             |
+
+
+### 📊 Database Tables
+
+🧑‍💼 **users**
+    | Column         | Type         | Constraints      |
+    | -------------- | ------------ | ---------------- |
+    | id             | SERIAL       | PRIMARY KEY      |
+    | name           | VARCHAR(100) | NOT NULL         |
+    | email          | VARCHAR(100) | UNIQUE, NOT NULL |
+    | password\_hash | TEXT         | NOT NULL         |
+    | address        | TEXT         | NOT NULL         |
+    | role           | VARCHAR(20)  | DEFAULT `'user'` |
+
+
+🏬 **stores**
+
+    | Column    | Type         | Constraints               |
+    | --------- | ------------ | ------------------------- |
+    | id        | SERIAL       | PRIMARY KEY               |
+    | name      | VARCHAR(100) | NOT NULL                  |
+    | address   | TEXT         | NOT NULL                  |
+    | email     | VARCHAR      | NOT NULL                  |
+    | owner_id  | INTEGER      | FOREIGN KEY → `users(id)` |
+
+
+⭐ **ratings**
+
+    | Column    | Type    | Constraints                    |
+    | --------- | ------- | ------------------------------ |
+    | id        | SERIAL  | PRIMARY KEY                    |
+    | user_id  | INTEGER | FOREIGN KEY → `users(id)`      |
+    | store_id | INTEGER | FOREIGN KEY → `stores(id)`     |
+    | rating    | INTEGER | CHECK (rating BETWEEN 1 AND 5) |
+
+🔐 **Middleware**
+
+    authMiddleware – Verifies JWT and attaches user to request
+
+    storeMiddleware – Restricts access to store owners
+
+    adminMiddleware – Restricts access to admin users
+
+---
+
+🔍 Project Structure
+
+    BACKEND/
+    ├── db.js                 # PostgreSQL connection config
+    ├── middleware.js         # JWT + Role middlewares
+    ├── server.js             # Main Express app
+    ├── .env                  # Environment variables
+    ├── package.json
+    └── README.md             # This file
+
+🧪 Scripts
+
+    "scripts": {
+        "start": "node src/index.js",
+        "dev": "nodemon src/index.js",
+        "test": "echo \"Test suite coming soon\""
+    }
+
+## 🧠 Author
+
+Engineered with purpose by Deepak U 🚀
