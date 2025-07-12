@@ -39,14 +39,18 @@ A robust backend system to manage store listings, user accounts, and customer ra
 
 3. **Configure environment**
 
-Create a .env file in the root directory:
+    Create a .env file in the root directory:  
 
-    # You can provide any Port
-    PORT=5001
-    # Provide your Database Url from render || docker || local.  
-    DB_URL= postgresql://username:password@port/your_database_name 
+        # You can provide any Port
+        PORT=5000
 
-Copy from .env.example if available.
+        # Provide your Database Url from render || docker || local.  
+        DATABASE_URL=postgresql://username:password@localhost:5432/your_db
+        
+        DB_SSL=false
+        JWT_SECRET=yourSuperSecretKey
+
+    Copy from .env.example if available.
 
 4. **Start the server**
     ```bash
@@ -82,7 +86,7 @@ Copy from .env.example if available.
     | id             | SERIAL       | PRIMARY KEY      |
     | name           | VARCHAR(100) | NOT NULL         |
     | email          | VARCHAR(100) | UNIQUE, NOT NULL |
-    | password_hash | TEXT         | NOT NULL          |
+    | password_hash  | TEXT         | NOT NULL         |
     | address        | TEXT         | NOT NULL         |
     | role           | VARCHAR(20)  | DEFAULT `'user'` |
 
@@ -103,8 +107,8 @@ Copy from .env.example if available.
     | Column    | Type    | Constraints                    |
     | --------- | ------- | ------------------------------ |
     | id        | SERIAL  | PRIMARY KEY                    |
-    | user_id  | INTEGER | FOREIGN KEY → `users(id)`      |
-    | store_id | INTEGER | FOREIGN KEY → `stores(id)`     |
+    | user_id   | INTEGER | FOREIGN KEY → `users(id)`      |
+    | store_id  | INTEGER | FOREIGN KEY → `stores(id)`     |
     | rating    | INTEGER | CHECK (rating BETWEEN 1 AND 5) |
 
 🔐 **Middleware**
