@@ -76,6 +76,7 @@ Copy from .env.example if available.
 ### 📊 Database Tables
 
 🧑‍💼 **users**
+
     | Column         | Type         | Constraints      |
     | -------------- | ------------ | ---------------- |
     | id             | SERIAL       | PRIMARY KEY      |
