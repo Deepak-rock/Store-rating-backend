@@ -3,7 +3,7 @@ const cors = require("cors");
 const bcrypt = require('bcryptjs');
 const db = require('./db')
 const jwt = require('jsonwebtoken');
-const {authMiddleware, adminMiddleware, storeMiddleware, userMiddleware} = require('./middleware');
+const {authMiddleware, adminMiddleware, storeMiddleware} = require('./middleware');
 require('dotenv').config();
 
 const app = express();
@@ -73,13 +73,18 @@ app.post('/login', async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({error : 'Invalid Password'});
     }
+
+    const storeQuery = 'SELECT id FROM stores WHERE owner_id = $1';
+    const storeRes = await db.query(storeQuery, [user.id]);
+    const storeId = user.role === 'store_owner' ? storeRes.rows[0]?.id || null : null;
+
     // Generate JWT
     const token = jwt.sign(
         { 
           id: user.id, 
           email: user.email, 
           role: user.role, 
-          store_id: user.store_id,
+          storeId: storeId,
         },
         JWT_SECRET,
         {expiresIn: '1d'},
@@ -262,7 +267,11 @@ app.post('/stores/:storeId/rate', authMiddleware, async (req, res) =>     {
 // GET /store-owner/dashboard
 app.get('/store/dashboard', authMiddleware, storeMiddleware, async (req, res) => {
   try {
-    const storeId = req.user.id;
+    const storeId = req.user.storeId;
+    
+    if (!storeId) {
+      return res.status(400).json({ error: 'Store ID missing for user' });
+    }
 
     const result = await db.query(
       `SELECT u.name AS user_name, r.rating, u.address, u.email
@@ -288,7 +297,7 @@ app.get('/store/dashboard', authMiddleware, storeMiddleware, async (req, res) =>
     if (!storeInfo.rows.length) {
       return res.status(404).json({ error: 'Store not found' });
     }
-    
+
     res.json({
       store_name: storeInfo.rows[0].name,
       average_rating: avg.rows[0].avg_rating || 0,
